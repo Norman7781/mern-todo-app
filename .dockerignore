@@ -1,0 +1,11 @@
+node_modules
+.env
+.git
+.gitignore
+README.md
+npm-debug.log
+**/node_modules
+**/.env
+.git
+.gitignore
+npm-debug.log
