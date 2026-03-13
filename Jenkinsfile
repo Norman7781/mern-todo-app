@@ -18,12 +18,12 @@ pipeline {
                     sh '''
                         docker rm -f finead-todo-test || true
                         docker run -d --name finead-todo-test \
-                          -p 8082:5000 \
-                          -e MONGODB_URI="$MONGODB_URI" \
-                          $IMAGE_NAME
+                            -e MONGODB_URI=$MONGODB_URI \
+                            degantheman4420/finead-todo-app:latest
                         sleep 15
-                        curl -f http://localhost:8082
-                        docker rm -f finead-todo-test || true
+                        docker logs finead-todo-test
+                        docker exec finead-todo-test wget -qO- http://localhost:5000 || \
+                        docker exec finead-todo-test curl -f http://localhost:5000
                     '''
                 }
             }
