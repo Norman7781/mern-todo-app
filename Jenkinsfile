@@ -14,16 +14,18 @@ pipeline {
 
         stage('Verify Container') {
             steps {
-                sh '''
-                    docker rm -f finead-todo-test || true
-                    docker run -d --name finead-todo-test \
-                      -p 8081:5000 \
-                      -e MONGODB_URI="mongodb+srv://vmes-ead:WQW4TVXAAvgoQoYb@cluster0.xzkm7.mongodb.net/?appName=Cluster0" \
-                      $IMAGE_NAME
-                    sleep 15
-                    curl -f http://localhost:8081
-                    docker rm -f finead-todo-test || true
-                '''
+                withCredentials([string(credentialsId: 'mongodb-uri', variable: 'MONGODB_URI')]) {
+                    sh '''
+                        docker rm -f finead-todo-test || true
+                        docker run -d --name finead-todo-test \
+                          -p 8082:5000 \
+                          -e MONGODB_URI="$MONGODB_URI" \
+                          $IMAGE_NAME
+                        sleep 15
+                        curl -f http://localhost:8082
+                        docker rm -f finead-todo-test || true
+                    '''
+                }
             }
         }
 
@@ -35,7 +37,7 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh '''
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                         docker push $IMAGE_NAME
                     '''
                 }
